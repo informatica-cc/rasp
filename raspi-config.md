@@ -77,7 +77,7 @@
 
 15. Check python is installed
 
-16. Copy rasp content into ~/rasp/ and edit to match route URL: https://www.bitbucket.org/luisdbenitop/public-rasp/src/main
+16. Copy rasp content into ~/rasp/ and edit to match route URL: https://github.com/informatica-cc/rasp/blob/main/app.py
 
 17. `python3 -m venv venv`
 
