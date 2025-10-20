@@ -83,7 +83,7 @@
 
 18. `pip install -r requirements.txt`
 
-19. `/home/cc/rasp/venv/bin/gunicorn -w 1 -b 0.0.0.0:5000 app:app`
+19. `/home/cc/rasp/venv/bin/python /home/cc/rasp/app.py`
 
 20. Check it works in localhost:5000
 
@@ -97,7 +97,7 @@ After=network.target
 [Service]
 User=cc
 WorkingDirectory=/home/cc/rasp
-ExecStart=/home/cc/rasp/venv/bin/gunicorn -w 1 -b 0.0.0.0:5000 app:app
+ExecStart=/home/cc/rasp/venv/bin/python /home/cc/rasp/app.py
 Restart=always
 
 [Install]
