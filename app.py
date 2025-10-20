@@ -53,3 +53,7 @@ def print():
 
 def error(msg, code):
     return ({"err": msg}, code, {"Content-Type": "application/json"})
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
