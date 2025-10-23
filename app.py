@@ -1,20 +1,24 @@
 from flask import Flask, request
 from escpos.printer import Usb
+import logging
 
 app = Flask(__name__)
 
-# https://python-escpos.readthedocs.io/en/latest/user/methods.html#escpos-class
+# Setup logging
+logging.basicConfig(
+    filename="/home/cc/rasp/printer.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
 
 
 @app.route("/", methods=["GET"])
-def print():
-    codigo = request.args.get("codigo", "")
+def print_codigo():
+    codigo = request.args.get("codigo", "test2api")
     ref = request.args.get("ref", "")
     pedido = request.args.get("pedido", "")
     operario = request.args.get("oper", "")
     mez = request.args.get("mez", "")
-    if not codigo:
-        return error("missing codigo", 400)
 
     mensaje = (
         "Codigo: "
@@ -29,6 +33,8 @@ def print():
         + pedido
     )
 
+    logging.info(f"Print request received:\n{codigo}")
+
     p = None
     try:
         p = Usb(0x04B8, 0x0E15)
@@ -37,27 +43,14 @@ def print():
         p.qr(codigo, size=13)
         p.cut()
         p.close()
-
+        logging.info("Print job completed successfully.")
     except Exception as exc:
-        print("Error printing: ")
-        print(str(exc))
+        logging.error(f"Error during printing: {exc}")
         try:
             if p:
                 p.cut()
                 p.close()
-        except:
-            print("Error closing printer")
+        except Exception as e:
+            logging.error(f"Error closing printer: {e}")
 
-    return (
-        {},
-        200,
-        {"Content-Type": "application/json"},
-    )
-
-
-def error(msg, code):
-    return ({"err": msg}, code, {"Content-Type": "application/json"})
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    return ({}, 200, {"Content-Type": "application/json"})
