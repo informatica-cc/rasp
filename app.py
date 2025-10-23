@@ -39,10 +39,14 @@ def print():
         p.close()
 
     except Exception as exc:
-        if p:
-            p.cut()
-            p.close()
-        return error(str(exc), 500)
+        print("Error printing: ")
+        print(str(exc))
+        try:
+            if p:
+                p.cut()
+                p.close()
+        except:
+            print("Error closing printer")
 
     return (
         {},
