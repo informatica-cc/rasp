@@ -97,7 +97,7 @@ After=network.target
 [Service]
 User=cc
 WorkingDirectory=/home/cc/rasp
-ExecStart=/home/cc/rasp/venv/bin/python /home/cc/rasp/app.py
+ExecStart=/home/cc/rasp/venv/bin/gunicorn -w 2 -b 0.0.0.0:5000 app:app
 Restart=always
 
 [Install]
