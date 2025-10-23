@@ -1,9 +1,13 @@
 from flask import Flask, request
 from escpos.printer import Usb
+import usb.core
 import os
 from datetime import datetime
 
 app = Flask(__name__)
+
+id_vendor = 0x04B8
+id_product = 0x0E15
 
 # --- Homemade logging setup ---
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -21,7 +25,19 @@ def log(message: str):
         print(f"Logging failed: {e}")
 
 
-log(f"--- App started, logging to {log_path} ---")
+def reset_printer():
+    dev = usb.core.find(idVendor=0x04B8, idProduct=0x0E15)
+    if dev:
+        try:
+            dev.reset()
+            log("USB printer reset successfully")
+        except Exception as e:
+            log(f"USB reset failed: {e}")
+    else:
+        log("Printer device not found for reset")
+
+
+log(f"--- App started ---")
 
 
 @app.route("/", methods=["GET"])
@@ -44,7 +60,7 @@ def print_codigo():
 
     p = None
     try:
-        p = Usb(0x04B8, 0x0E15)
+        p = Usb(id_vendor, id_product)
         p.set(double_height=True, double_width=True)
         p.text(mensaje)
         p.qr(codigo, size=13)
@@ -52,13 +68,7 @@ def print_codigo():
         p.close()
     except Exception as exc:
         log(f"Error during printing: {exc}")
-        try:
-            if p:
-                p.cut()
-                p.close()
-            else:
-                log("Printer object not initialized. Cannot close.")
-        except Exception as e:
-            log(f"Error closing printer: {e}")
+    finally:
+        reset_printer()
 
     return ({}, 200, {"Content-Type": "application/json"})
