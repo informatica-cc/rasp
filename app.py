@@ -1,15 +1,27 @@
 from flask import Flask, request
 from escpos.printer import Usb
-import logging
+import os
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Setup logging
-logging.basicConfig(
-    filename="/home/cc/rasp/printer.log",
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+# --- Homemade logging setup ---
+script_dir = os.path.dirname(os.path.abspath(__file__))
+log_path = os.path.join(script_dir, "printer.log")
+
+
+def log(message: str):
+    """Simple homemade logger that appends messages to printer.log."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = f"{timestamp} | {message}\n"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(line)
+    except Exception as e:
+        print(f"Logging failed: {e}")
+
+
+log(f"--- App started, logging to {log_path} ---")
 
 
 @app.route("/", methods=["GET"])
@@ -21,19 +33,14 @@ def print_codigo():
     mez = request.args.get("mez", "")
 
     mensaje = (
-        "Codigo: "
-        + codigo
-        + "\nReferencia: "
-        + ref
-        + "\nMezcla: "
-        + mez
-        + "\nOperador: "
-        + operario
-        + "\nPedido: "
-        + pedido
+        f"Codigo: {codigo}\n"
+        f"Referencia: {ref}\n"
+        f"Mezcla: {mez}\n"
+        f"Operador: {operario}\n"
+        f"Pedido: {pedido}"
     )
 
-    logging.info(f"Print request received:\n{codigo}")
+    log(f"Print request received:\n{codigo}")
 
     p = None
     try:
@@ -43,14 +50,14 @@ def print_codigo():
         p.qr(codigo, size=13)
         p.cut()
         p.close()
-        logging.info("Print job completed successfully.")
+        log("Print job completed successfully.")
     except Exception as exc:
-        logging.error(f"Error during printing: {exc}")
+        log(f"Error during printing: {exc}")
         try:
             if p:
                 p.cut()
                 p.close()
         except Exception as e:
-            logging.error(f"Error closing printer: {e}")
+            log(f"Error closing printer: {e}")
 
     return ({}, 200, {"Content-Type": "application/json"})
