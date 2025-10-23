@@ -26,7 +26,7 @@ log(f"--- App started, logging to {log_path} ---")
 
 @app.route("/", methods=["GET"])
 def print_codigo():
-    codigo = request.args.get("codigo", "test2api")
+    codigo = request.args.get("codigo", "testapi")
     ref = request.args.get("ref", "")
     pedido = request.args.get("pedido", "")
     operario = request.args.get("oper", "")
@@ -40,7 +40,7 @@ def print_codigo():
         f"Pedido: {pedido}"
     )
 
-    log(f"Print request received:\n{codigo}")
+    log(f"Print request received: {codigo}")
 
     p = None
     try:
@@ -50,13 +50,14 @@ def print_codigo():
         p.qr(codigo, size=13)
         p.cut()
         p.close()
-        log("Print job completed successfully.")
     except Exception as exc:
         log(f"Error during printing: {exc}")
         try:
             if p:
                 p.cut()
                 p.close()
+            else:
+                log("Printer object not initialized. Cannot close.")
         except Exception as e:
             log(f"Error closing printer: {e}")
 
