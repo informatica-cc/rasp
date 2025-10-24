@@ -26,7 +26,7 @@ def log(message: str):
 
 
 def reset_printer():
-    dev = usb.core.find(idVendor=0x04B8, idProduct=0x0E15)
+    dev = usb.core.find(idVendor=id_vendor, idProduct=id_product)
     if dev:
         try:
             dev.reset()
