@@ -48,6 +48,7 @@ def print_codigo():
     pedido = request.args.get("pedido", "")
     operario = request.args.get("oper", "")
     mez = request.args.get("mez", "")
+    fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     mensaje = (
         f"Codigo: {codigo}\n"
@@ -55,6 +56,7 @@ def print_codigo():
         f"Mezcla: {mez}\n"
         f"Operador: {operario}\n"
         f"Pedido: {pedido}"
+        f"{fecha_hora}\n"
     )
 
     log(f"Print request received: {codigo}")
