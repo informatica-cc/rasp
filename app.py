@@ -3,6 +3,7 @@ from escpos.printer import Usb
 import usb.core
 import os
 from datetime import datetime
+import time
 
 app = Flask(__name__)
 
@@ -65,6 +66,7 @@ def print_codigo():
         p.text(mensaje)
         p.qr(codigo, size=13)
         p.cut()
+        time.sleep(1.5)
         p.close()
     except Exception as exc:
         log(f"Error during printing: {exc}")
