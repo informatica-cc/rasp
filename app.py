@@ -1,6 +1,5 @@
 from flask import Flask, request
 from escpos.printer import Usb
-import usb.core
 import os
 from datetime import datetime
 import time
@@ -26,16 +25,13 @@ def log(message: str):
         print(f"Logging failed: {e}")
 
 
-def reset_printer():
-    dev = usb.core.find(idVendor=id_vendor, idProduct=id_product)
-    if dev:
-        try:
-            dev.reset()
-            log("USB printer reset successfully")
-        except Exception as e:
-            log(f"USB reset failed: {e}")
-    else:
-        log("Printer device not found for reset")
+p = None
+try:
+    log("Attempting to connect to printer...")
+    p = Usb(id_vendor, id_product)
+    log("Connected to printer successfully.")
+except Exception as e:
+    log(f"Printer connection failed: {e}")
 
 
 log(f"--- App started ---")
@@ -61,18 +57,14 @@ def print_codigo():
 
     log(f"Print request received: {codigo}")
 
-    p = None
     try:
-        p = Usb(id_vendor, id_product)
         p.set(double_height=True, double_width=True)
         p.text(mensaje)
         p.qr(codigo, size=13)
         p.cut()
-        time.sleep(1.5)
-        p.close()
     except Exception as exc:
         log(f"Error during printing: {exc}")
     finally:
-        reset_printer()
+        time.sleep(1.5)
 
     return ({}, 200, {"Content-Type": "application/json"})
