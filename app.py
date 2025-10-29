@@ -46,23 +46,12 @@ except Exception as e:
 log(f"--- App started ---")
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["POST"])
 def print_codigo():
-    codigo = request.args.get("codigo", "testapi")
-    ref = request.args.get("ref", "")
-    pedido = request.args.get("pedido", "")
-    operario = request.args.get("oper", "")
-    mez = request.args.get("mez", "")
+    data = request.get_json(force=True, silent=True) or {}
+    mensaje = data.get("mensaje", "Test")
+    codigo = data.get("codigo", "Test")
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M")
-
-    mensaje = (
-        f"Codigo: {codigo}\n"
-        f"Referencia: {ref}\n"
-        f"Mezcla: {mez}\n"
-        f"Operador: {operario}\n"
-        f"Pedido: {pedido}"
-        f"{fecha_hora}\n"
-    )
 
     log(f"Print request received: {codigo}")
 
@@ -73,7 +62,8 @@ def print_codigo():
     try:
         p.set(double_height=True, double_width=True)
         p.text(mensaje)
-        p.qr(codigo, size=13)
+        p.qr(codigo, size=11)
+        p.text(f"{fecha_hora}\n")
         p.cut()
     except Exception as exc:
         log(f"Error during printing: {exc}")
