@@ -1,5 +1,6 @@
 from flask import Flask, request
 from escpos.printer import Usb
+import usb.core
 import os
 from datetime import datetime
 import time
@@ -23,6 +24,14 @@ def log(message: str):
             f.write(line)
     except Exception as e:
         print(f"Logging failed: {e}")
+
+
+try:
+    log("Releasing usb device...")
+    dev = usb.core.find(idVendor=id_vendor, idProduct=id_product)
+    usb.util.dispose_resources(dev)
+except Exception as e:
+    log(f"Error releasing usb device {e}")
 
 
 p = None
@@ -56,6 +65,10 @@ def print_codigo():
     )
 
     log(f"Print request received: {codigo}")
+
+    if p is None:
+        log("Printer not connected.")
+        return ({}, 200, {"Content-Type": "application/json"})
 
     try:
         p.set(double_height=True, double_width=True)
