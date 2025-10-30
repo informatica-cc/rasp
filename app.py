@@ -5,25 +5,48 @@ from datetime import datetime
 import random
 import string
 
-app = Flask(__name__)
 
-id_vendor = 0x04B8
-id_product = 0x0E15
+class Log:
+    def __init__(self):
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.log_path = os.path.join(self.script_dir, "printer.log")
 
-# --- Homemade logging setup ---
-script_dir = os.path.dirname(os.path.abspath(__file__))
-log_path = os.path.join(script_dir, "printer.log")
+    def log(self, message: str):
+        """Simple homemade logger that appends messages to printer.log."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        line = f"{timestamp} | {message}\n"
+        try:
+            with open(self.log_path, "a", encoding="utf-8") as f:
+                f.write(line)
+        except Exception as e:
+            print(f"Logging failed: {e}")
 
 
-def log(message: str):
-    """Simple homemade logger that appends messages to printer.log."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    line = f"{timestamp} | {message}\n"
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(line)
-    except Exception as e:
-        print(f"Logging failed: {e}")
+class Printer:
+    id_vendor = 0x04B8
+    id_product = 0x0E15
+    usb_printer = None
+
+    def __init__(self):
+        self.usb_printer = None
+
+    def loadUsbPrinter(self):
+        try:
+            logging.log("Attempting to connect to printer...")
+            self.usb_printer = Usb(self.id_vendor, self.id_product)
+            self.usb_printer.set(double_height=True, double_width=True)
+            logging.log("Connected to printer successfully.")
+        except Exception as e:
+            logging.log(f"Printer connection failed: {e}")
+
+    def getUsb(self):
+        if not self.usb_printer:
+            self.loadUsbPrinter()
+        return self.usb_printer
+
+
+def http_response():
+    return ({}, 200, {"Content-Type": "application/json"})
 
 
 def generateUID():
@@ -34,17 +57,12 @@ def generateUID():
     )
 
 
-p = None
-try:
-    log("Attempting to connect to printer...")
-    p = Usb(id_vendor, id_product)
-    p.set(double_height=True, double_width=True)
-    log("Connected to printer successfully.")
-except Exception as e:
-    log(f"Printer connection failed: {e}")
+app = Flask(__name__)
+logging = Log()
+printer = Printer()
 
 
-log(f"--- App started ---")
+logging.log(f"--- App started ---")
 
 
 @app.after_request
@@ -63,11 +81,13 @@ def print_codigo():
 
     uid = generateUID()
 
-    log(f"Print request received: {codigo} | UID: {uid}")
+    logging.log(f"Print request received: {codigo} | UID: {uid}")
 
-    if p is None:
-        log("Printer not connected.")
-        return ({}, 200, {"Content-Type": "application/json"})
+    p = printer.getUsb()
+
+    if not p:
+        logging.log("Error: Printer not connected.")
+        return http_response()
 
     try:
         p.text(f"{uid}\n")
@@ -77,6 +97,6 @@ def print_codigo():
         p._raw(b"\n")
         p.cut()
     except Exception as exc:
-        log(f"Error during printing: {str(exc)}")
+        logging.log(f"Error during printing: {str(exc)}")
 
-    return ({}, 200, {"Content-Type": "application/json"})
+    return http_response()
