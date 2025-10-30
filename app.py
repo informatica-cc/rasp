@@ -47,6 +47,14 @@ except Exception as e:
 log(f"--- App started ---")
 
 
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    return response
+
+
 @app.route("/", methods=["POST"])
 def print_codigo():
     data = request.get_json(force=True, silent=True) or {}
@@ -64,6 +72,7 @@ def print_codigo():
     try:
         p.text(f"UID: {uid}\n")
         p.qr(codigo, size=11)
+        p._raw(b"\n")
         p.text(mensaje)
         p._raw(b"\n")
         p.cut()
