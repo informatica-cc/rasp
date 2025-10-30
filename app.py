@@ -70,7 +70,7 @@ def print_codigo():
         return ({}, 200, {"Content-Type": "application/json"})
 
     try:
-        p.text(f"UID: {uid}\n")
+        p.text(f"{uid}\n")
         p.qr(codigo, size=11)
         p._raw(b"\n")
         p.text(mensaje)
