@@ -73,8 +73,11 @@ def after_request(response):
     return response
 
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["POST", "OPTIONS"])
 def print_codigo():
+    if request.method == "OPTIONS":
+        return http_response()
+
     data = request.get_json(force=True, silent=True) or {}
     mensaje = data.get("mensaje", "Test")
     codigo = data.get("codigo", "Test")
