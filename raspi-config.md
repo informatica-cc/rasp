@@ -128,3 +128,24 @@ Añadirlo tb al programa app.py de dentro de la carpeta /rasp
 30. `sudo udevadm control --reload-rules`
 
 31. `sudo udevadm trigger`
+
+Example of curl for localhost POST
+
+```
+curl 'http://localhost:5000/' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: es-ES,es;q=0.9,en;q=0.8' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: http://localhost:4200' \
+  -H 'Referer: http://localhost:4200/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  --data-raw '{"mensaje":"a13023\nVN150E-G\nEPDM-008/1\nOper: \nPedido: 961","codigo":"a13023"}'
+
+```
