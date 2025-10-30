@@ -8,7 +8,7 @@
 
 5. `sudo apt update && sudo apt upgrade -y`
 
-6. Instalar chromium, terminal y openbox con los xorgs suficientes`sudo apt install --no-install-recommends xserver-xorg x11-xserver-utils xinit openbox chromium-browser xterm geany -y`
+6. Instalar chromium, terminal y openbox con los xorgs suficientes`sudo apt install --no-install-recommends git xserver-xorg x11-xserver-utils xinit openbox chromium-browser xterm geany -y`
 
 7. `mkdir -p ~/.config/openbox`
 
@@ -75,19 +75,20 @@
 
 ### Set up print + apache2
 
-15. Check python is installed
+15. Check python is installed (python -v)
 
-16. Copy rasp content into ~/rasp/ and edit to match route URL: https://github.com/informatica-cc/rasp/blob/main/app.py
+16. `git clone https://github.com/informatica-cc/rasp.git rasp`
 
-17. `python3 -m venv venv`
+17. `cd rasp`
+18. `python3 -m venv venv`
 
-18. `pip install -r requirements.txt`
+19. `pip install -r requirements.txt`
 
-19. `/home/cc/rasp/venv/bin/python /home/cc/rasp/app.py`
+20. `/home/cc/rasp/venv/bin/python /home/cc/rasp/app.py`
 
-20. Check it works in localhost:5000
+21. Check it works in localhost:5000
 
-21. `sudo nano /etc/systemd/system/epos-print.service`
+22. `sudo nano /etc/systemd/system/epos-print.service`
 
 ```Nano
 [Unit]
@@ -104,7 +105,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-22. Enable service
+23. Enable service
 
 ```Bash
 sudo systemctl daemon-reload
@@ -113,21 +114,21 @@ sudo systemctl start epos-print
 sudo systemctl status epos-print
 ```
 
-23. Plug printer
+24. Plug printer
 
-24. `lsusb`
+25. `lsusb`
     Coger la dirección de la epson, parecida a esta: 0x04b8,0x0202
 
-25. `sudo nano /lib/udev/rules.d/99-myusb.rules`
+26. `sudo nano /lib/udev/rules.d/99-myusb.rules`
     SUBSYSTEMS=="usb", ATTRS{idVendor}=="04b8", ATTRS{idProduct}=="0e15", MODE="0666"
 
 idVendor e idProduct con lo que corresponde (sin el 0x)
 
-Añadirlo tb al programa app.py de dentro de la carpeta /rasp
+Añadirlo tb al programa print.py de dentro de la carpeta /rasp
 
-30. `sudo udevadm control --reload-rules`
+27. `sudo udevadm control --reload-rules`
 
-31. `sudo udevadm trigger`
+28. `sudo udevadm trigger`
 
 Example of curl for localhost POST
 
