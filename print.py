@@ -11,7 +11,7 @@ logging = Log()
 logging.log("Detached spawner here, initializing printer")
 
 try:
-    payload = json.loads(sys.argv[1])
+    payload = json.loads(sys.argv[1]) if len(sys.argv) > 1 else {}
     codigo = payload.get("codigo", "TEST")
     mensaje = payload.get("mensaje", "TEST")
     uid = payload.get("uid", "N/A")
