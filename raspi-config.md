@@ -8,7 +8,7 @@
 
 5. `sudo apt update && sudo apt upgrade -y`
 
-6. Instalar chromium, terminal y openbox con los xorgs suficientes`sudo apt install --no-install-recommends git xserver-xorg x11-xserver-utils xinit openbox chromium-browser xterm geany -y`
+6. Instalar git, chromium, terminal y openbox con los xorgs suficientes`sudo apt install --no-install-recommends git xserver-xorg x11-xserver-utils xinit openbox chromium xterm geany -y`
 
 7. `mkdir -p ~/.config/openbox`
 
@@ -19,7 +19,7 @@
    xset s off
    xset s noblank
 
-   chromium-browser --noerrdialogs --disable-infobars --kiosk http://10.0.0.2:7777/rasp/maquinas
+   chromium --noerrdialogs --disable-infobars --kiosk http://10.0.0.2:7777/rasp/maquinas
 ```
 
 9. `nano ~/.xinitrc`
