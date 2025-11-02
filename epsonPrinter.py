@@ -1,4 +1,4 @@
-from escpos.printer import Usb
+from escpos import printer
 from customLog import Log
 import random
 import string
@@ -13,7 +13,7 @@ class Printer:
 
     def print(self, codigo="TEST", mensaje="TEST"):
         thread = threading.Thread(
-            target=self._print_job, args=(codigo, mensaje), daemon=True
+            target=self._print_job_dummy, args=(codigo, mensaje), daemon=True
         )
         thread.start()
 
@@ -21,12 +21,30 @@ class Printer:
         try:
             uid = self._generateUID()
             self.logging.log(f"Print request received {codigo} {uid}")
-            p = Usb(self.id_vendor, self.id_product, timeout=4000)
+            p = printer.Usb(self.id_vendor, self.id_product, timeout=4000)
             p.set(double_height=True, double_width=True)
             p.text(f"{uid}\n")
             p.qr(codigo, size=11)
             p.text(f"\n{mensaje}\n")
             p.cut()
+            p.close()
+            self.logging.log("Printed successfully")
+        except Exception as exc:
+            self.logging.log(f"Error during printing: {str(exc)}")
+
+    def _print_job_dummy(self, codigo, mensaje):
+        try:
+            uid = self._generateUID()
+            self.logging.log(f"Print request received {codigo} {uid}")
+            dummy = printer.Dummy()
+            dummy.set(double_height=True, double_width=True)
+            dummy.text(f"{uid}\n")
+            dummy.qr(codigo, size=11)
+            dummy.text(f"\n{mensaje}\n")
+            dummy.cut()
+
+            p = printer.Usb(self.id_vendor, self.id_product, timeout=4000)
+            p._raw(dummy.output)
             p.close()
             self.logging.log("Printed successfully")
         except Exception as exc:
