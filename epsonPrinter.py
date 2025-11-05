@@ -24,7 +24,7 @@ class Printer:
             dummy = printer.Dummy()
             dummy.set(double_height=True, double_width=True)
             dummy.text(f"{uid}\n")
-            dummy.qr(codigo, size=11)
+            dummy.qr(codigo, size=11, native=True)
             dummy.text(f"\n{mensaje}\n")
             dummy.cut()
 
