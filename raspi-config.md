@@ -19,7 +19,7 @@
    xset s off
    xset s noblank
 
-   chromium --noerrdialogs --disable-infobars --kiosk http://10.0.0.2:7777/rasp/maquinas
+   chromium --noerrdialogs --disable-infobars --kiosk http://10.0.0.99/rasp/maquinas
 ```
 
 9. `nano ~/.xinitrc`
